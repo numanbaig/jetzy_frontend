@@ -23,7 +23,8 @@ import {
 } from '@mui/material';
 
 const SideBarLayout = (): React.JSX.Element => {
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+
+
   const [isExpanded, setIsExpanded] = React.useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,11 +33,9 @@ const SideBarLayout = (): React.JSX.Element => {
     { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard/overview' },
     { label: 'Companies', icon: <Building2 size={20} />, path: '/dashboard/companies' },
     { label: 'Employees', icon: <Users size={20} />, path: '/dashboard/employees' },
-    { label: 'Settings', icon: <Settings size={20} />, path: '/dashboard/settings' },
   ];
 
   const handleNavigation = (path: string, index: number) => {
-    setSelectedIndex(index);
     navigate(path);
   };
 
@@ -58,14 +57,13 @@ const SideBarLayout = (): React.JSX.Element => {
           flexShrink: 0,
         }}
       >
-        {/* Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid #34495e' }}>
           {isExpanded ? (
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <LayoutDashboard size={24} />
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                  SalesSync
+                  Jetzy CRM
                 </Typography>
               </Box>
               <IconButton
