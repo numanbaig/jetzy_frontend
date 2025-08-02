@@ -16,6 +16,7 @@ import {
 } from "@mui/icons-material";
 
 export default function DashboardOverview(): React.JSX.Element {
+  
   const stats = [
     {
       title: "Total Companies",
@@ -46,8 +47,6 @@ export default function DashboardOverview(): React.JSX.Element {
   return (
     <Box sx={{ flexGrow: 1, p: 3, backgroundColor: "#f4f6f9" }}>
       <Container maxWidth="xl">
-        {/* Page Header */}
-        <DashboardOverview/>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ color: "#2c3e50", fontWeight: "bold" }}>
             Dashboard Overview
@@ -57,10 +56,9 @@ export default function DashboardOverview(): React.JSX.Element {
           </Typography>
         </Box>
 
-        {/* Stats Cards */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           {stats.map((stat, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid key={index}>
               <Card
                 sx={{
                   borderRadius: 2,
@@ -101,10 +99,8 @@ export default function DashboardOverview(): React.JSX.Element {
           ))}
         </Grid>
 
-        {/* Main Content Area */}
         <Grid container spacing={3}>
-          {/* Recent Activity */}
-          <Grid item xs={12} md={8}>
+          <Grid>
             <Card
               sx={{
                 borderRadius: 2,
@@ -149,9 +145,7 @@ export default function DashboardOverview(): React.JSX.Element {
               </CardContent>
             </Card>
           </Grid>
-
-          {/* Quick Actions */}
-          <Grid item xs={12} md={4}>
+          <Grid >
             <Card
               sx={{
                 borderRadius: 2,

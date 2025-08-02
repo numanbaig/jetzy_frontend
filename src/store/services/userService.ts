@@ -18,10 +18,7 @@ export const userLogin = (build: any) => {
         const { user, token } = data?.data ?? {};
 
         if (user && token) {
-          // 1. Store token in localStorage
           localStorage.setItem("authToken", token);
-
-          // 2. Dispatch user to auth slice
           dispatch(loginSuccess({ email: user.email, name: "Admin" }));
         }
       } catch (err: any) {

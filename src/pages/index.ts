@@ -1,3 +1,4 @@
 
-export { default as Settings } from './Settings';
+export { default as Companies } from './Companies';
+export { default as Employees } from './Employees';
 

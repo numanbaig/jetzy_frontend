@@ -9,10 +9,13 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useUserLoginMutation } from "@/store/appApi";
+import { useNavigate } from "react-router-dom";
 
 export default function Login(): React.JSX.Element {
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();
 
   const [loginUser, { isLoading, isError, error }] = useUserLoginMutation();
   const formik = useFormik({
@@ -31,8 +34,8 @@ export default function Login(): React.JSX.Element {
           password: values.password,
           role: "admin",
         }).unwrap();
+        navigate("/dashboard/overview");
   
-        // Everything else (token storage, user dispatch, redirect) is handled in the service
       } catch (err) {
         console.error("Login failed:", err);
       }

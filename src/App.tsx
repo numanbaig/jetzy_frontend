@@ -7,9 +7,9 @@ import { BrowserRouter } from 'react-router';
 export default function App(): React.JSX.Element {
   return (
     <BrowserRouter>
-    <Provider store={store}>
+      <Provider store={store}>
         <AppRouter />
-    </Provider>
+      </Provider>
     </BrowserRouter>
   )
 };

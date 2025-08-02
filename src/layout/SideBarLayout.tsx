@@ -21,6 +21,9 @@ import {
   Typography,
   IconButton,
 } from '@mui/material';
+import { logout } from '@/store/slices/auth_slice';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '@/store/store';
 
 const SideBarLayout = (): React.JSX.Element => {
 
@@ -28,6 +31,8 @@ const SideBarLayout = (): React.JSX.Element => {
   const [isExpanded, setIsExpanded] = React.useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const user = useSelector((state: RootState) => state.auth);
 
   const navItems = [
     { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard/overview' },
@@ -38,8 +43,11 @@ const SideBarLayout = (): React.JSX.Element => {
   const handleNavigation = (path: string, index: number) => {
     navigate(path);
   };
+const dispatch=useDispatch();
 
   const handleLogout = () => {
+    localStorage.removeItem("authToken")
+    dispatch(logout())
     navigate('/auth/login');
   };
 
@@ -94,10 +102,10 @@ const SideBarLayout = (): React.JSX.Element => {
               </Avatar>
               <Box>
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                  {'Administrator'}
+                  {user?.name??'Administrator'}
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                  {'admin@admin.com'}
+                  {user?.email??'default@admin.com'}
                 </Typography>
               </Box>
             </Box>
