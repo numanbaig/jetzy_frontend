@@ -23,9 +23,7 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye, 
   Search,
-  RefreshCw,
   ArrowUpDown,
   ArrowUp,
   ArrowDown
@@ -38,7 +36,6 @@ import {
 } from "../../store/appApi";
 import type { Company } from "../../store/services/companyService";
 
-import { theme } from "../../styles/theme";
 
 export default function Companies(): React.JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,8 +50,11 @@ export default function Companies(): React.JSX.Element {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // RTK Query hooks
-  const { data: companies, isLoading, error, refetch } = useGetAllCompaniesQuery({});
-  const [deleteCompany, { isLoading: isDeleting }] = useDeleteCompanyMutation();
+  const { data: companies, isLoading, refetch } = useGetAllCompaniesQuery({});
+  const [deleteCompany] = useDeleteCompanyMutation();
+  
+  // Type-safe data access
+  const companiesData = (companies as any)?.data || [];
 
   const handleOpenAddModal = () => {
     setSelectedCompany(null);
@@ -87,9 +87,9 @@ export default function Companies(): React.JSX.Element {
 
   // Filter and sort companies
   const filteredAndSortedCompanies = useMemo(() => {
-    if (!companies?.data || !Array.isArray(companies?.data)) return [];
+    if (!companiesData || !Array.isArray(companiesData)) return [];
 
-    let filtered = companies?.data?.filter((company: Company) =>
+    let filtered = companiesData.filter((company: Company) =>
       company?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (company?.email && company?.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (company?.website && company?.website.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -109,7 +109,7 @@ export default function Companies(): React.JSX.Element {
     });
 
     return filtered;
-  }, [companies, searchTerm, sortField, sortDirection]);
+  }, [companiesData, searchTerm, sortField, sortDirection]);
 
   const paginatedCompanies = useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -130,7 +130,7 @@ export default function Companies(): React.JSX.Element {
     return sortDirection === "asc" ? <ArrowUp size={16} /> : <ArrowDown size={16} />;
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -247,7 +247,7 @@ export default function Companies(): React.JSX.Element {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {paginatedCompanies.map((company) => (
+                      {paginatedCompanies.map((company: Company) => (
                         <TableRow 
                           key={company._id} 
                           sx={{ 
@@ -296,6 +296,7 @@ export default function Companies(): React.JSX.Element {
                           <TableCell sx={{ textAlign: "center" }}>
                             <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                               <Tooltip title="View Company">
+                                <span></span>
                               </Tooltip>
                               <Tooltip title="Edit Company">
                                 <IconButton

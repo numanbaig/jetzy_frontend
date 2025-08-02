@@ -20,6 +20,18 @@ export interface UpdateCompanyRequest extends Partial<CreateCompanyRequest> {
   _id: string;
 }
 
+export interface CompanyResponse {
+  success: boolean;
+  message: string;
+  data: Company;
+}
+
+export interface CompaniesListResponse {
+  success: boolean;
+  message: string;
+  data: Company[];
+}
+
 export const getAllCompanies = (build: any) => {
   return build.query({
     query: () => {

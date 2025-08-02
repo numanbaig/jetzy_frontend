@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Users } from "lucide-react";
@@ -46,6 +46,9 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
   const [createEmployee, { isLoading: isCreating }] = useCreateEmployeeMutation();
   const [updateEmployee, { isLoading: isUpdating }] = useUpdateEmployeeMutation();
   const { data: companies, isLoading: isLoadingCompanies } = useGetAllCompaniesQuery({});
+  
+  // Type-safe data access
+  const companiesData = (companies as any)?.data || [];
 
   const isLoading = isCreating || isUpdating;
   const isEdit = mode === 'edit';
@@ -82,7 +85,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
 
 
-  const companyOptions = (companies as any)?.data?.map((company: any) => ({
+  const companyOptions = companiesData.map((company: any) => ({
     value: company._id,
     label: company.name,
   })) || [];

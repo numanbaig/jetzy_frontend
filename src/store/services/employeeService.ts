@@ -27,6 +27,18 @@ export interface UpdateEmployeeRequest extends Partial<CreateEmployeeRequest> {
   _id: string;
 }
 
+export interface EmployeeResponse {
+  success: boolean;
+  message: string;
+  data: Employee;
+}
+
+export interface EmployeesListResponse {
+  success: boolean;
+  message: string;
+  data: Employee[];
+}
+
 export const getAllEmployees = (build: any) => {
   return build.query({
     query: () => {

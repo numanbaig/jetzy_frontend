@@ -22,7 +22,6 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye, 
   Search,
   ArrowUpDown,
   ArrowUp,
@@ -53,6 +52,9 @@ export default function Employees(): React.JSX.Element {
   const { data: employees, isLoading, refetch } = useGetAllEmployeesQuery({});
   const { data: companies } = useGetAllCompaniesQuery({});
   const [deleteEmployee] = useDeleteEmployeeMutation();
+  
+  // Type-safe data access
+  const employeesData = (employees as any)?.data || [];
 
   const handleOpenAddModal = () => {
     setSelectedEmployee(null);
@@ -85,9 +87,9 @@ export default function Employees(): React.JSX.Element {
 
   // Filter and sort employees
   const filteredAndSortedEmployees = useMemo(() => {
-    if (!(employees as any)?.data || !Array.isArray((employees as any).data)) return [];
+    if (!employeesData || !Array.isArray(employeesData)) return [];
 
-    let filtered = (employees as any).data.filter((employee: Employee) =>
+    let filtered = employeesData.filter((employee: Employee) =>
       employee.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (employee.email && employee.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -109,7 +111,7 @@ export default function Employees(): React.JSX.Element {
     });
 
     return filtered;
-  }, [employees, searchTerm, sortField, sortDirection]);
+  }, [employeesData, searchTerm, sortField, sortDirection]);
 
   const paginatedEmployees = useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -289,6 +291,7 @@ export default function Employees(): React.JSX.Element {
                           <TableCell sx={{ textAlign: "center" }}>
                             <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                               <Tooltip title="View Employee">
+                                <span></span>
                               </Tooltip>
                               <Tooltip title="Edit Employee">
                                 <IconButton
