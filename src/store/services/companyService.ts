@@ -12,7 +12,7 @@ export interface Company {
 export interface CreateCompanyRequest {
   name: string;
   email?: string;
-  logo?: string;
+  logo?: string | File;
   website?: string;
 }
 
@@ -30,7 +30,7 @@ export const getAllCompanies = (build: any) => {
       };
     },
     providesTags: ['Company'],
-    async onQueryStarted(payload: any, { queryFulfilled }: any) {
+    async onQueryStarted(_payload: any, { queryFulfilled }: any) {
       try {
         const { data } = await queryFulfilled;
         console.log("Get all companies API response:", data);
@@ -50,8 +50,8 @@ export const getCompanyById = (build: any) => {
         method: "GET",
       };
     },
-    providesTags: (result: any, error: any, id: string) => [{ type: 'Company', id }],
-    async onQueryStarted(payload: any, { queryFulfilled }: any) {
+    providesTags: (_result: any, _error: any, id: string) => [{ type: 'Company', id }],
+    async onQueryStarted(_payload: any, { queryFulfilled }: any) {
       try {
         const { data } = await queryFulfilled;
         console.log("Get company by ID API response:", data);
@@ -65,62 +65,70 @@ export const getCompanyById = (build: any) => {
 export const createCompany = (build: any) => {
   return build.mutation({
     query: (payload: CreateCompanyRequest) => {
+      // Always use FormData to avoid JSON payload size limits with images
       const formData = new FormData();
-      
-      // Append all fields including name
       formData.append('name', payload.name);
       formData.append('email', payload.email || '');
       formData.append('website', payload.website || '');
       
-      // Handle logo - ensure the field name matches what multer expects ('logo')
+      // Handle logo - File or base64 string  
       if (payload.logo) {
         if (payload.logo instanceof File) {
           formData.append('logo', payload.logo);
         } else if (typeof payload.logo === 'string' && payload.logo.startsWith('data:')) {
-          const blob = dataURLtoBlob(payload.logo);
+          // Convert base64 to Blob to avoid JSON payload size limits
+          const arr = payload.logo.split(',');
+          const mime = arr[0].match(/:(.*?);/)![1];
+          const bstr = atob(arr[1]);
+          const u8arr = new Uint8Array(bstr.length);
+          for (let i = 0; i < bstr.length; i++) {
+            u8arr[i] = bstr.charCodeAt(i);
+          }
+          const blob = new Blob([u8arr], { type: mime });
           formData.append('logo', blob, 'logo.png');
+        } else if (typeof payload.logo === 'string') {
+          formData.append('logo', payload.logo);
         }
       }
 
       return {
         url: '/company/create',
         method: 'POST',
-        body: formData,
+        data: formData,
       };
     },
   });
 };
 
-function dataURLtoBlob(dataURL: string) {
-  const arr = dataURL.split(',');
-  const mime = arr[0].match(/:(.*?);/)![1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new Blob([u8arr], { type: mime });
-}
+
 export const updateCompany = (build: any) => {
   return build.mutation({
-    query: async (payload: UpdateCompanyRequest) => {
+    query: (payload: UpdateCompanyRequest) => {
       console.log("Payload being sent to /companies/update_by_id:", payload);
-      
       const { _id, ...companyData } = payload;
       
-      // Create FormData for file upload
+      // Always use FormData to avoid JSON payload size limits with images
       const formData = new FormData();
       formData.append('name', companyData.name || '');
       if (companyData.email) formData.append('email', companyData.email);
       if (companyData.website) formData.append('website', companyData.website);
+      
+      // Handle logo - File or base64 string
       if (companyData.logo) {
-        // Convert base64 to blob if it's a base64 string
-        if (companyData.logo.startsWith('data:')) {
-          const response = await fetch(companyData.logo);
-          const blob = await response.blob();
+        if (companyData.logo instanceof File) {
+          formData.append('logo', companyData.logo);
+        } else if (typeof companyData.logo === 'string' && companyData.logo.startsWith('data:')) {
+          // Convert base64 to Blob to avoid JSON payload size limits
+          const arr = companyData.logo.split(',');
+          const mime = arr[0].match(/:(.*?);/)![1];
+          const bstr = atob(arr[1]);
+          const u8arr = new Uint8Array(bstr.length);
+          for (let i = 0; i < bstr.length; i++) {
+            u8arr[i] = bstr.charCodeAt(i);
+          }
+          const blob = new Blob([u8arr], { type: mime });
           formData.append('logo', blob, 'logo.png');
-        } else {
+        } else if (typeof companyData.logo === 'string') {
           formData.append('logo', companyData.logo);
         }
       }
@@ -129,12 +137,9 @@ export const updateCompany = (build: any) => {
         url: `/company/update_by_id/${_id}`,
         method: "PUT",
         data: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
       };
     },
-    invalidatesTags: (result: any, error: any, { _id }: UpdateCompanyRequest) => [{ type: 'Company', id: _id }],
+    invalidatesTags: (_result: any, _error: any, { _id }: UpdateCompanyRequest) => [{ type: 'Company', id: _id }],
     async onQueryStarted(payload: any, { queryFulfilled }: any) {
       console.log("onQueryStarted - update company payload:", payload);
       try {

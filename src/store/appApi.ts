@@ -8,6 +8,13 @@ import {
     updateCompany, 
     deleteCompany 
 } from "./services/companyService";
+import {
+    getAllEmployees,
+    getEmployeeById,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee
+} from "./services/employeeService";
 
 
 const BASE_URL = "http://localhost:8000/api/v1";
@@ -24,6 +31,11 @@ const appApi = createApi({
         createCompany: createCompany(build),
         updateCompany: updateCompany(build),
         deleteCompany: deleteCompany(build),
+        getAllEmployees: getAllEmployees(build),
+        getEmployeeById: getEmployeeById(build),
+        createEmployee: createEmployee(build),
+        updateEmployee: updateEmployee(build),
+        deleteEmployee: deleteEmployee(build),
     }),
 });
 
@@ -36,4 +48,9 @@ export const {
     useCreateCompanyMutation,
     useUpdateCompanyMutation,
     useDeleteCompanyMutation,
+    useGetAllEmployeesQuery,
+    useGetEmployeeByIdQuery,
+    useCreateEmployeeMutation,
+    useUpdateEmployeeMutation,
+    useDeleteEmployeeMutation,
 } = appApi;

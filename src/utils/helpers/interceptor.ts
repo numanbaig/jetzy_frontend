@@ -19,15 +19,35 @@ export const AxiosInterceptor = () => {
       console.log("Token used in interceptor:", token);
 
       try {
+        // Handle FormData - don't set Content-Type for FormData (let browser set it)
+        const isFormData = data instanceof FormData;
+        console.log("Is FormData:", isFormData);
+        
+        if (isFormData) {
+          console.log("FormData contents:");
+          for (const [key, value] of data.entries()) {
+            console.log(`  ${key}:`, value instanceof File ? `File(${value.name})` : value);
+          }
+        }
+
+        const requestHeaders = {
+          Authorization: token ? `Bearer ${token}` : "",
+          ...headers,
+        };
+
+        // If it's FormData, don't set Content-Type (browser will set multipart/form-data with boundary)
+        if (isFormData && requestHeaders['Content-Type']) {
+          delete requestHeaders['Content-Type'];
+        }
+
+        console.log("Final headers:", requestHeaders);
+
         const result = await axios({
           url: `${baseUrl}${url}`,
           method,
           data,
           params,
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-            ...headers,
-          },
+          headers: requestHeaders,
         });
         return { data: result.data };
       } catch (axiosError) {
